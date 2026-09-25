@@ -110,3 +110,13 @@ input[type=text]{font:inherit;padding:9px 12px;border-radius:10px;border:1.5px s
 .viewers{font-size:13.5px;color:var(--muted);margin-top:6px}
 .share{display:flex;gap:6px;margin-top:8px}
 .share input{flex:1;font-size:12.5px;padding:6px 8px}
+
+/* Bàn cờ thu nhỏ: xem cùng lúc 4 trận trong phòng */
+.mini{display:grid;grid-template-columns:repeat(9,1fr);aspect-ratio:1/1;margin-top:6px;border:3px solid var(--boardEdge);border-radius:6px;overflow:hidden}
+.mini .m{display:flex;align-items:center;justify-content:center;background:var(--sqA);min-width:0}
+.mini .m.dark{background:var(--sqB)}
+.mini .m.last{box-shadow:inset 0 0 0 2px rgba(255,214,90,.95)}
+.mini i{font-style:normal;width:84%;height:84%;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:clamp(6px,1.05vw,11px);line-height:1;border:1.5px solid}
+.mini i.b{background:var(--blueSoft);border-color:var(--blue)}
+.mini i.p{background:var(--pinkSoft);border-color:var(--pink)}
+@media (max-width:620px){.mini i{font-size:clamp(7px,2.2vw,12px)}}

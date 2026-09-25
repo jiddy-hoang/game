@@ -145,7 +145,7 @@ Net.connect().then(() => {
   if(m) goOnline(m[1].toUpperCase());
 }).catch(e => {
   console.error(e);
-  $("netState").textContent = "Không kết nối được máy chủ playhtml – vẫn chơi được 2 người trên 1 máy.";
+  $("netState").textContent = "Không kết nối được máy chủ playhtml (" + (e && e.message ? e.message : "lỗi mạng") + ") – vẫn chơi được 2 người trên 1 máy.";
   $("roomList").innerHTML = '<li class="note">Chế độ nhiều người cần kết nối Internet.</li>';
 });
 })();

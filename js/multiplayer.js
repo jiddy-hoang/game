@@ -30,10 +30,12 @@ function loadLib(){
 async function connect(){
   PH = await loadLib();
   await new Promise((ok, fail) => {
+    // Mạng chặn WebSocket thì playhtml chờ mãi, nên tự báo lỗi sau 20 giây.
+    const timer = setTimeout(() => fail(new Error("quá thời gian kết nối tới api.playhtml.fun")), 20000);
     PH.init({ room: "ottv2-game", cursors: {enabled:false}, onError: () => fail(new Error("mất kết nối máy chủ playhtml")) })
-      .then(ok, fail);
+      .then(() => PH.ready)
+      .then(() => { clearTimeout(timer); ok(); }, fail);
   });
-  await PH.ready;
   connected = true;
   lobbyCh = PH.createPageData("ott-rooms", {});
   lobbyCh.onUpdate(() => roomListeners.forEach(f => f()));

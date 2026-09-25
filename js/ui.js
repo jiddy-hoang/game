@@ -31,9 +31,25 @@ function renderTables(A){
     const st = g.winner ? `${R.SIDE_NAME[g.winner]} thắng` : (!g.bId || !g.pId) ? "Còn ghế trống" : `Lượt ${R.SIDE_NAME[g.turn]} · nước ${g.n}`;
     const mine = A.mySideAt(t) ? ' <span class="me">(bạn)</span>' : "";
     b.innerHTML = `<b>Bàn ${t+1}</b>${mine}<span class="vs">${esc(g.bName||"—")} vs ${esc(g.pName||"—")}</span><span class="st">${st}</span>`;
+    b.appendChild(miniBoard(g));
+    b.setAttribute("aria-label", `Bàn ${t+1}: ${g.bName||"ghế trống"} đấu ${g.pName||"ghế trống"}, ${st}. Bấm để xem lớn.`);
     b.onclick = () => A.pickTable(t);
     box.appendChild(b);
   });
+}
+
+// Bàn cờ thu nhỏ để xem cùng lúc mọi trận trong phòng (luôn để hàng 9 ở trên).
+function miniBoard(g){
+  const m = document.createElement("div");
+  m.className = "mini";
+  m.setAttribute("aria-hidden", "true");
+  for(let r=8; r>=0; r--) for(let c=0; c<9; c++){
+    const i = r*9+c, ch = g.board[i], d = document.createElement("span");
+    d.className = "m" + ((r+c)%2===0 ? " dark" : "") + (i===g.lastFrom || i===g.lastTo ? " last" : "");
+    if(ch!=="."){ const p = document.createElement("i"); p.className = R.sideOf(ch); p.textContent = R.EMO[R.typeOf(ch)]; d.appendChild(p); }
+    m.appendChild(d);
+  }
+  return m;
 }
 
 function renderBoard(A, game){
