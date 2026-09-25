@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Oẳn tù tì v2</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Be+Vietnam+Pro:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/game.css">
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1><span class="hand">✊</span> Oẳn tù tì v2</h1>
+      <p id="netState">Đang kết nối máy chủ…</p>
+    </header>
+
+    <section id="lobby">
+      <div class="panel rules">
+        <h2>Cách chơi</h2>
+        <div class="cycle">✊ <small>ăn</small> ✌️ <small>ăn</small> ✋ <small>ăn</small> ✊</div>
+        <ol>
+          <li>Bàn 9×9, mỗi bên 10 quân: đấm ✊, kéo ✌️, lá ✋.</li>
+          <li>Mỗi lượt đi 1 quân, 1 ô theo 8 hướng như quân vua.</li>
+          <li>Đấm ăn kéo, kéo ăn lá, lá ăn đấm. Hai quân cùng loại không ăn được nhau, chỉ chặn đường.</li>
+          <li>Thắng khi ăn hết sạch một loại quân của đối phương, hoặc đưa quân vào ô đích: Xanh tới I9, Hồng tới A1.</li>
+        </ol>
+      </div>
+
+      <div class="panel">
+        <h2>Vào chơi</h2>
+        <div class="row top-gap">
+          <input class="grow" type="text" id="nameIn" maxlength="20" placeholder="Tên của bạn" aria-label="Tên của bạn">
+        </div>
+        <div class="row small-gap">
+          <button class="btn" id="createBtn">Tạo phòng mới</button>
+          <input class="room-code-input" type="text" id="codeIn" maxlength="5" placeholder="Mã phòng" aria-label="Mã phòng">
+          <button class="btn ghost" id="joinBtn">Vào phòng</button>
+        </div>
+        <div class="row small-gap">
+          <button class="btn ghost" id="localBtn">Chơi 2 người trên 1 máy</button>
+        </div>
+        <h3 class="rooms-title">Phòng đang mở</h3>
+        <ul class="rooms" id="roomList"><li class="note">Đang tải danh sách phòng…</li></ul>
+      </div>
+    </section>
+
+    <section id="game" class="hidden">
+      <div>
+        <div class="boardWrap"><div class="board" id="board" role="grid" aria-label="Bàn cờ 9x9"></div></div>
+      </div>
+      <aside class="side">
+        <div class="panel">
+          <div class="row spread">
+            <div class="note" id="roomLabel"></div>
+            <button class="btn ghost compact-btn" id="backBtn">Rời phòng</button>
+          </div>
+          <div id="status" class="status"></div>
+        </div>
+        <div class="panel">
+          <div class="seat b" id="seatB"><span class="dot"></span><span class="nm"></span><span class="act"></span></div>
+          <div class="counts" id="cntB"></div>
+          <div class="seat-spacer"></div>
+          <div class="seat p" id="seatP"><span class="dot"></span><span class="nm"></span><span class="act"></span></div>
+          <div class="counts" id="cntP"></div>
+        </div>
+        <div class="panel">
+          <div class="row spread">
+            <h3 class="log-title">Nước đi</h3>
+            <button class="btn ghost compact-btn" id="resetBtn">Ván mới</button>
+          </div>
+          <ol class="log" id="log"></ol>
+        </div>
+      </aside>
+    </section>
+  </div>
+
+  <div class="toast hidden" id="toast" role="status"></div>
+  <script src="js/rules.js"></script>
+  <script src="js/lan-multiplayer.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

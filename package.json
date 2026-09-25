@@ -1,0 +1,10 @@
+{
+  "name": "oan-tu-ti-v2-lan",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Game Oẳn tù tì bàn cờ cho hai người chơi trong cùng mạng LAN",
+  "scripts": {
+    "start": "node server.js",
+    "check": "node --check server.js && node --check js/rules.js && node --check js/lan-multiplayer.js && node --check js/app.js"
+  }
+}
