@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Oẳn tù tì v2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Be+Vietnam+Pro:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/game.css">
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1><span class="hand">✊</span> Oẳn tù tì v2</h1>
+    <p id="netState">Đang kết nối máy chủ playhtml…</p>
+  </header>
+
+  <!-- LOBBY -->
+  <section id="lobby">
+    <div class="panel rules">
+      <h2>Cách chơi</h2>
+      <div class="cycle">✊ <small>ăn</small> ✌️ <small>ăn</small> ✋ <small>ăn</small> ✊</div>
+      <ol>
+        <li>Bàn 9×9, mỗi bên 10 quân: đấm ✊, kéo ✌️, lá ✋.</li>
+        <li>Mỗi lượt đi 1 quân, 1 ô theo 8 hướng như quân vua.</li>
+        <li>Đấm ăn kéo, kéo ăn lá, lá ăn đấm. Hai quân cùng loại không ăn được nhau, chỉ chặn đường.</li>
+        <li>Thắng khi ăn hết sạch một loại quân của đối phương, hoặc đưa quân vào ô đích: Xanh tới I9, Hồng tới A1.</li>
+        <li>Mỗi phòng có 4 bàn (tối đa 8 người chơi), người xem vào bao nhiêu cũng được.</li>
+      </ol>
+    </div>
+    <div class="panel">
+      <h2>Vào chơi</h2>
+      <div class="row" style="margin-top:10px">
+        <input type="text" id="nameIn" maxlength="20" placeholder="Tên của bạn" aria-label="Tên của bạn" style="flex:1">
+      </div>
+      <div class="row" style="margin-top:8px">
+        <button class="btn" id="createBtn" disabled>Tạo phòng mới</button>
+        <input type="text" id="codeIn" maxlength="5" placeholder="Mã phòng" aria-label="Mã phòng" style="width:120px;text-transform:uppercase">
+        <button class="btn ghost" id="joinBtn" disabled>Vào phòng</button>
+      </div>
+      <div class="row" style="margin-top:8px">
+        <button class="btn ghost" id="localBtn">Chơi 2 người trên 1 máy</button>
+      </div>
+      <h3 style="margin-top:18px;font-size:20px">Phòng đang mở</h3>
+      <ul class="rooms" id="roomList"><li class="note">Đang tải danh sách phòng…</li></ul>
+    </div>
+  </section>
+
+  <!-- GAME -->
+  <section id="game" class="hidden">
+    <div>
+      <div class="tables" id="tables"></div>
+      <div class="boardWrap"><div class="board" id="board" role="grid" aria-label="Bàn cờ 9x9"></div></div>
+    </div>
+    <aside class="side">
+      <div class="panel">
+        <div class="row" style="justify-content:space-between">
+          <div class="note" id="roomLabel"></div>
+          <button class="btn ghost" id="backBtn" style="padding:5px 12px">Rời phòng</button>
+        </div>
+        <div class="viewers" id="viewers"></div>
+        <div class="share hidden" id="share">
+          <input type="text" id="shareLink" readonly aria-label="Link phòng">
+          <button class="btn ghost" id="copyBtn" style="padding:5px 10px">Chép link</button>
+        </div>
+        <div id="status" style="margin-top:8px"></div>
+      </div>
+      <div class="panel">
+        <div class="seat b" id="seatB"><span class="dot"></span><span class="nm"></span><span class="act"></span></div>
+        <div class="counts" id="cntB"></div>
+        <div style="height:10px"></div>
+        <div class="seat p" id="seatP"><span class="dot"></span><span class="nm"></span><span class="act"></span></div>
+        <div class="counts" id="cntP"></div>
+      </div>
+      <div class="panel">
+        <div class="row" style="justify-content:space-between">
+          <h3 style="font-size:18px">Nước đi</h3>
+          <button class="btn ghost" id="resetBtn" style="padding:5px 12px">Ván mới</button>
+        </div>
+        <ol class="log" id="log"></ol>
+      </div>
+    </aside>
+  </section>
+</div>
+<div class="toast hidden" id="toast" role="status"></div>
+
+<!-- playhtml (playhtml.fun) chỉ có bản ES module: nạp rồi gắn vào window.playhtmlLib cho multiplayer.js dùng -->
+<script type="module">
+import { playhtml } from "https://unpkg.com/playhtml@2.14.1";
+window.playhtmlLib = playhtml;   // không dùng window.playhtml: playhtml tự dùng biến đó khi init
+window.dispatchEvent(new Event("playhtml-loaded"));
+</script>
+<script src="js/rules.js"></script>
+<script src="js/multiplayer.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
