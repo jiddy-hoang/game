@@ -14,6 +14,7 @@ function showGame(){ $("lobby").classList.add("hidden"); $("game").classList.rem
 function renderRoomInfo(A){
   const online = A.mode==="online";
   $("share").classList.toggle("hidden", !online);
+  $("delRoomBtn").classList.toggle("hidden", !online || !Net.canDelete(Net.roomCode()));
   if(!online){ $("viewers").textContent = ""; return; }
   const players = A.tables.reduce((n,g) => n + (g.bId?1:0) + (g.pId?1:0), 0);
   $("viewers").textContent = `👀 ${Net.inRoom()} người trong phòng · ${players}/8 người chơi`;

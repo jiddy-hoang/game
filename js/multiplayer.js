@@ -64,7 +64,7 @@ function listRooms(){
   const now = Date.now(), data = connected ? lobbyCh.getData() : {};
   return Object.entries(data||{})
     .filter(([,r]) => r && now - (r.updatedAt||0) < ROOM_TTL)
-    .map(([c, r]) => ({code: c, players: r.players||0, inRoom: idsIn(c).size}))
+    .map(([c, r]) => ({code: c, players: r.players||0, inRoom: idsIn(c).size, canDelete: canDelete(c)}))
     .sort((a,b) => (data[b.code].updatedAt||0) - (data[a.code].updatedAt||0))
     .slice(0, 20);
 }
@@ -74,13 +74,33 @@ function makeCode(){
   do{ s = ""; for(let i=0;i<5;i++) s += a[Math.floor(Math.random()*a.length)]; } while(roomExists(s));
   return s;
 }
-function touchRoom(){
+// create = true chỉ khi vừa tạo phòng; các lần sau chỉ cập nhật để phòng đã bị xoá không tự sống lại.
+function touchRoom(create){
   const players = cache.reduce((n,g) => n + (g.bId?1:0) + (g.pId?1:0), 0), now = Date.now(), c = code;
+  if(!c) return;
   lobbyCh.setData(d => {
     for(const k of Object.keys(d)) if(!d[k] || now - (d[k].updatedAt||0) > ROOM_TTL) delete d[k];
     if(d[c]){ d[c].updatedAt = now; d[c].players = players; }
-    else d[c] = {createdAt: now, updatedAt: now, players};
+    else if(create) d[c] = {createdAt: now, updatedAt: now, players, owner: myId};
   });
+}
+
+// Người tạo phòng xoá được bất cứ lúc nào; phòng không còn ai khác ở trong thì ai cũng xoá được
+// (ghế còn tên người đã thoát không tính, vì không ai ở đó để giải phóng ghế).
+function canDelete(c){
+  const r = connected ? (lobbyCh.getData()||{})[c] : null;
+  if(!r) return false;
+  if(r.owner === myId) return true;
+  return ![...idsIn(c)].some(id => id !== myId);
+}
+function deleteRoom(c){
+  if(!canDelete(c)) throw new Error("chỉ người tạo phòng mới xoá được phòng đang có người");
+  // Xoá dữ liệu 4 bàn rồi gỡ phòng khỏi danh sách. Người đang ở trong phòng sẽ thấy phòng biến mất và về sảnh.
+  for(let t=0; t<TABLES; t++){
+    if(c === code){ cache[t] = Rules.newGame(); chans[t].setData(cache[t]); }
+    else { const ch = PH.createPageData(`ott-${c}-t${t}`, Rules.newGame()); ch.setData(Rules.newGame()); ch.destroy(); }
+  }
+  lobbyCh.setData(d => { delete d[c]; });
 }
 
 // roomCode = null → tạo phòng mới.
@@ -95,7 +115,7 @@ async function start(roomCode, name){
     chans.push(ch); cache.push(ch.getData());
     ch.onUpdate(g => { cache[t] = g; emit(); });
   }
-  if(isNew) touchRoom();
+  if(isNew) touchRoom(true);
   history.replaceState(null, "", "#r=" + code);
   publish();
 }
@@ -123,7 +143,9 @@ function setTable(t, g){ cache[t] = g; chans[t].setData(g); touchRoom(); }
 
 window.Net = {
   TABLES,
-  connect, listRooms, start,
+  connect, listRooms, start, canDelete, deleteRoom,
+  // Phòng mình đang ở đã bị ai đó xoá khỏi danh sách.
+  roomGone: () => !!code && !roomExists(code),
   isStarted: () => !!code,
   isConnected: () => connected,
   myId: () => myId,

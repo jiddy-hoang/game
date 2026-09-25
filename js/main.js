@@ -94,8 +94,22 @@ function renderRooms(){
     const li = document.createElement("li");
     li.innerHTML = `<span class="code">${esc(r.code)}</span><span class="who">${r.players}/8 người chơi · ${r.inRoom} người trong phòng</span>${tag}`;
     const btn = document.createElement("button"); btn.className="btn ghost"; btn.style.padding="5px 12px"; btn.textContent="Vào";
-    btn.onclick = () => goOnline(r.code); li.appendChild(btn); ul.appendChild(li);
+    btn.onclick = () => goOnline(r.code); li.appendChild(btn);
+    if(r.canDelete){
+      const del = document.createElement("button"); del.className="btn ghost"; del.style.padding="5px 10px";
+      del.textContent="Xoá"; del.title="Xoá phòng " + r.code; del.setAttribute("aria-label", "Xoá phòng " + r.code);
+      del.onclick = () => removeRoom(r.code); li.appendChild(del);
+    }
+    ul.appendChild(li);
   }
+}
+
+function removeRoom(c){
+  const inside = Net.roomCode() === c;
+  if(!confirm(`Xoá phòng ${c}? Các ván đang chơi trong phòng sẽ mất${inside ? " và mọi người sẽ bị đưa về sảnh" : ""}.`)) return;
+  try{ Net.deleteRoom(c); }catch(e){ UI.toast("Không xoá được: " + e.message + "."); return; }
+  UI.toast("Đã xoá phòng " + c + ".");
+  if(inside) Net.leave(); else renderRooms();
 }
 
 /* ---------- nút bấm ---------- */
@@ -122,6 +136,7 @@ $("backBtn").onclick = () => {
   A.mode = null; A.tables = [];
   $("game").classList.add("hidden"); $("lobby").classList.remove("hidden");
 };
+$("delRoomBtn").onclick = () => removeRoom(Net.roomCode());
 $("resetBtn").onclick = () => {
   const g = A.tables[A.cur]; if(!g) return;
   if(A.mode==="online" && !A.mySideAt(A.cur)){ UI.toast("Chỉ người đang ngồi ở bàn này mới bắt đầu ván mới được."); return; }
@@ -136,7 +151,17 @@ $("copyBtn").onclick = async () => {
 
 // Kết nối máy chủ ngay khi mở trang để hiện danh sách phòng.
 // Mở link có mã phòng (#r=CODE) thì vào thẳng phòng đó.
-Net.onRoomsChange(() => { if(!Net.isStarted()) renderRooms(); else draw(); });
+let kicked = false;
+Net.onRoomsChange(() => {
+  if(!Net.isStarted()){ renderRooms(); return; }
+  if(Net.roomGone() && !kicked){
+    kicked = true;
+    UI.toast("Phòng " + Net.roomCode() + " đã bị xoá. Đang về sảnh…");
+    setTimeout(Net.leave, 1500);
+    return;
+  }
+  draw();
+});
 Net.connect().then(() => {
   $("netState").textContent = "Đã kết nối máy chủ. Tạo phòng hoặc vào phòng của bạn bè.";
   $("createBtn").disabled = $("joinBtn").disabled = false;
